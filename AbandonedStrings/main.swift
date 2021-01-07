@@ -28,9 +28,13 @@ func findFilesIn(_ directories: [String], withExtensions extensions: [String]) -
         }
         while let path = enumerator.nextObject() as? String {
             let fileExtension = (path as NSString).pathExtension.lowercased()
-            if extensions.contains(fileExtension) {
-                let fullPath = (directory as NSString).appendingPathComponent(path)
-                files.append(fullPath)
+            let fullPath = (directory as NSString).appendingPathComponent(path)
+            var isDir: ObjCBool = false
+            fileManager.fileExists(atPath: fullPath, isDirectory: &isDir)
+            if !isDir.boolValue {
+                if extensions.contains(fileExtension) {
+                    files.append(fullPath)
+                }
             }
         }
     }
