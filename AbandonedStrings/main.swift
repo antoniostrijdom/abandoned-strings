@@ -166,29 +166,29 @@ func displayAbandonedIdentifiersInMap(_ map: StringsFileToAbandonedIdentifiersMa
     }
 }
 
-if let rootDirectories = getRootDirectories() {
-    print("Searching for abandoned resource strings…")
-    let withStoryboard = isOptionalParameterForStoryboardAvailable()
-    let map = findAbandonedIdentifiersIn(rootDirectories, withStoryboard: withStoryboard)
-    if map.isEmpty {
-        print("No abandoned resource strings were detected.")
-    }
-    else {
-        print("Abandoned resource strings were detected:")
-        displayAbandonedIdentifiersInMap(map)
-        
-        if isOptionaParameterForWritingAvailable() {
-            map.keys.forEach { (stringsFilePath) in
-                print("\n\nNow modifying \(stringsFilePath) ...")
-                let updatedStringsFileContent = stringsFile(stringsFilePath, without: map[stringsFilePath]!)
-                do {
-                    try updatedStringsFileContent.write(toFile: stringsFilePath, atomically: true, encoding: .utf8)
-                } catch {
-                    print("ERROR writing file: \(stringsFilePath)")
-                }
+guard let rootDirectories = getRootDirectories(), !rootDirectories.isEmpty else {
+    print("Please provide the root directory for source code files as a command line argument.")
+    exit(1)
+}
+print("Searching for abandoned resource strings…")
+let withStoryboard = isOptionalParameterForStoryboardAvailable()
+let map = findAbandonedIdentifiersIn(rootDirectories, withStoryboard: withStoryboard)
+if map.isEmpty {
+    print("No abandoned resource strings were detected.")
+}
+else {
+    print("Abandoned resource strings were detected:")
+    displayAbandonedIdentifiersInMap(map)
+    
+    if isOptionaParameterForWritingAvailable() {
+        map.keys.forEach { (stringsFilePath) in
+            print("\n\nNow modifying \(stringsFilePath) ...")
+            let updatedStringsFileContent = stringsFile(stringsFilePath, without: map[stringsFilePath]!)
+            do {
+                try updatedStringsFileContent.write(toFile: stringsFilePath, atomically: true, encoding: .utf8)
+            } catch {
+                print("ERROR writing file: \(stringsFilePath)")
             }
         }
     }
-} else {
-    print("Please provide the root directory for source code files as a command line argument.")
 }
